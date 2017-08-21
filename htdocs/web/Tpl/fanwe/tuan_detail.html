@@ -1,0 +1,465 @@
+<?php
+$this->_var['pagecss'] = array();
+$this->_var['pagejs'] = array();
+$this->_var['pagecss'][] = TMPL_REAL."/css/style.css";
+$this->_var['pagecss'][] = TMPL_REAL."/css/weebox.css";
+$this->_var['pagejs'][] = TMPL_REAL."/js/jquery.bgiframe.js";
+$this->_var['pagejs'][] = TMPL_REAL."/js/jquery.weebox.js";
+$this->_var['pagejs'][] = TMPL_REAL."/js/jquery.pngfix.js";
+$this->_var['pagejs'][] = TMPL_REAL."/js/lazyload.js";
+$this->_var['pagejs'][] = TMPL_REAL."/js/script.js";
+$this->_var['cpagejs'][] = TMPL_REAL."/js/script.js";
+$this->_var['pagecss'][] = TMPL_REAL."/css/tuan_detail.css";
+$this->_var['pagejs'][] = TMPL_REAL."/js/tuan_detail.js";
+$this->_var['pagecss'][] = TMPL_REAL."/css/review.css";
+$this->_var['pagejs'][] = TMPL_REAL."/js/ajax_pages_more.js";
+?>
+{include file="inc/header.html"}
+<script type="text/javascript">
+var systime = <?php echo NOW_TIME ?>;
+var endtime = {$result.tuan_end_time};
+var sub_order_url='{$result.sub_url}';
+var ticket_id='{$result.ticket_id}';
+$(function() {
+    left_time_clock();
+	$('.collect_button').click(function(){
+		AddFavorite('{$result.add_url}','{$result.name}');
+	})
+});
+</script>
+<script type="text/javascript" src="{$TMPL}/js/jquery.select.js"></script>
+<link href='{$TMPL}/js/fullcalendar/fullcalendar.css' rel='stylesheet' />
+<link href='{$TMPL}/js/fullcalendar/fullcalendar.print.css' rel='stylesheet' media='print' />
+<script src='{$TMPL}/js/fullcalendar/fullcalendar.min.js'></script>
+
+{if $result.state eq 5}
+<div class="main">该团品不存在</div>
+{else}
+<div class="nav_locate">
+	  <a href="{url x="tuan#advance"}" class="lucky_bonus">团购预告</a>
+	  <a href="{url x="tuan#history"}" class="lucky_bonus">往期团购</a>
+	  <a href="{url x="index#index"}">首页</a> &gt <a href="{url r="tuan"}">旅游团购（共<em>{$total_count}</em>条可卖团品）</a> &gt <a>{$result.name}</a>
+</div>
+
+
+
+<div class="buy_detail {if $result.state eq 1}onsell{elseif $result.state eq 2}starting{elseif $result.state eq 3}ended{elseif $result.state eq 4}sellup{/if}">
+	<h1>{$result.name}</h1>
+	<div class="buy_detail_profile">{$result.brief}</div>
+    <div class="buy_detail_content">
+		<div class="buy_pic">
+			<img src="{function name="get_spec_image" v=$image_url w=473 h=331 g=1}">
+	    </div>
+		<div class="buy_detail_info">
+			{if $type eq 1}
+			<form action="{url a="tourline_order#index"}" method="post" >
+			<input type="hidden" name="tourline_id" value="{$result.id}">
+			{/if}
+			<div class="buy_price">
+				<div class="discount">
+					<span>{$result.discount}</span>
+					折
+				</div>
+				<div class="price_num">
+					<small>￥</small>{$result.price}起
+
+				</div>
+				<div class="original_price">
+					<span class="original_price_up">节省 <em>￥{$result.save}</em></span>
+					<span>原价 <del>￥{$result.origin_price}</del></span>
+
+				</div>
+				<div class="buy_now">
+					{if $type eq 2}
+					<span class="ticket_sub"><a  {if $result.state eq 1 and $result.is_history eq 0}href="javascript:void(0);" class="buying"{else}class="nobuy" onclick="javascript:return false;"{/if}>{if $result.state eq 1  and $result.is_history eq 0}{$result.button_name}{else}已下架{/if}</a></span>
+					{elseif $type eq 1}
+					<input type="submit" name="to_order" class="pay_button f_l {if $result.state eq 1  and $result.is_history eq 0}buying{else}nobuy{/if}" value="{if $result.state gte 1  and $result.is_history eq 0}{$result.button_name}{else}已下架{/if}" {if $result.state neq 1}disabled="true"{/if}>
+					{/if}
+				</div>
+			</div>
+			{if $type eq 1}
+			<div class="travel_input">
+
+				<div class="travel_input_inner">
+					<select class="start_date" name="tourline_item_id">
+						<option value="0">请选择出发日期</option>
+						{foreach from=$tourline_item item=t_item}
+						<option value="{$t_item.id_start_time}" title="{$t_item.time_price}{$t_item.brief}">
+							{function name=msubstr v=$t_item.time_price a=0 b=20}
+						</option>
+						{/foreach}
+					</select>
+					<select class="adult_num" name="adult_count">
+						{foreach from=$select_num item=select_adult key=key}
+						<option value="{$select_adult.value}" {if $key eq 0}selected=selected{/if}>
+							{$select_adult.value}
+						</option>
+						{/foreach}
+					</select><span>成人</span>
+					<select class="child_num" name="child_count">
+						<option value="0">0</option>
+						{foreach from=$select_num item=select_child key=key}
+						<option value="{$select_child.value}">
+							{$select_child.value}
+						</option>
+						{/foreach}
+					</select><span class="children_norm">儿童 {if $result.child_norm}<a>儿童标准？</a> <div class="norm_value">{$result.child_norm}</div>{/if}</span>
+
+					<span><a href="{$supplier.company_description}" title="" target="_blank">营业执照</a></span>
+				</div>
+			</div>
+			</form>
+			{/if}
+
+			<div class="buy_state {if $type eq 2}buy_state_ticket{/if}">
+				<div class="person_num {if $type eq 2}person_num_ticket{/if}">
+
+				<span>{$result.sale_virtual_total}</span>
+				人已购买
+				</div>
+				{if $result.is_history eq 0}
+				<div class="tuan_ad">数量有限，行动要快哦！</div>
+				<div class="remain_time">
+					<img src="{$TMPL}/images/tuan/remain_time.png">
+					<span class="bx">
+	                	{$result.count_down}
+					</span>
+				</div>
+				{/if}
+		    </div>
+
+			<div class="satisfaction {if $type eq 2}satisfaction_ticket{/if}">
+				<span class="satisfaction1">满意度：</span>
+                <span class="satisfaction2">98%</span>
+				<!-- <span class="satisfaction2">{$result.satify}%</span>  -->
+				<!-- <span class="satisfaction3">已有<em>{$result.review_num}</em>条点评 </span> -->
+				{if $result.is_review_return eq 1}<a href="#J_nbox_6" class="return_money">{$result.review_return}</a>{/if}
+		    </div>
+
+
+
+	    </div>
+
+
+
+	</div>
+</div>
+<script>
+	$(document).ready(function(){
+		$(".calendar select").sSelect();
+
+		//日历价格
+	$('#calendar').fullCalendar({
+			header:{
+				left: 'prev',
+				center: 'title',
+				right: 'next'
+			},
+			monthNames: ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'],
+			dayNamesShort:['日','一','二','三','四','五','六'],
+			buttonText: {
+                prev: ' ◄ ',
+                next: ' ► ',
+                prevYear: ' << ',
+                nextYear: ' >> ',
+                today: '今天',
+                month: '月',
+                week: '周',
+                day: '天'
+            },
+			height: 540,
+			events: {$json_item},
+
+		    eventClick: function(calEvent, jsEvent, view) {
+				$(".mid-buy_box").show();
+				$(".mid-buy_box").css({"position":"absolute","left":jsEvent.pageX-100,"top":jsEvent.pageY+20});
+				$(".mid-buy_box").find(".mid_tourline_item_id").val(calEvent.id);
+				$(".mid-buy_box").find(".mid_tourline_item_time").val($.fullCalendar.formatDate( calEvent.start, 'yyyy-MM-d'));
+		    },
+			eventMouseover: function(calEvent, jsEvent, view) {
+				if(calEvent.content.length >0)
+				{
+					$(".calendar_mouseover").html(calEvent.content);
+					$(".calendar_mouseover").show();
+					$(".calendar_mouseover").css({"position":"absolute","left":jsEvent.pageX+20,"top":jsEvent.pageY-50});
+				}
+		    },
+			eventMouseout: function(calEvent, jsEvent, view) {
+				$(".calendar_mouseover").hide();
+		    },
+			loading: function(bool) {
+				if(bool)
+					$('#loading').show();
+				else
+					$('#loading').hide();
+			}
+
+		});
+	});
+
+</script>
+<style>
+	/*fullcalendar(日历插件)修改 样式 */
+#loading {
+		position: absolute;
+		top: 5px;
+		right: 5px;
+		}
+
+	#calendar {
+	    width: 698px;
+		margin: 0 auto;
+		}
+	.fc-header {
+		border: 1px solid #EAEAEA;
+		border-bottom: none;
+	}
+	.fc-header-title h2 {
+		margin: 0 auto;
+		white-space: nowrap;
+		display: inline-block;
+		width: 68px;
+		height: 22px;
+		line-height: 22px;
+		font-size: 12px;
+		color: #404040;
+		margin: 0 auto;
+		font-weight: 400;
+		}
+	.fc-state-default {
+		background:none;
+		border:none;
+	}
+	.fc-button{
+		display:inherit;
+	}
+
+	.fc-header-left,.fc-header-right{
+		width:26px;
+	}
+	.fc-state-default, .fc-state-default .fc-button-inner {
+		color: #0053AA;
+	}
+	.fc-event{
+		background:none;
+		border:none;
+	}
+	.fc-event-inner{
+		text-align:center;
+	}
+	.fc-event-title{
+		font-size:13px;
+	}
+/*fullcalendar(日历插件)修改 样式 end*/
+</style>
+<div class="main">
+	<div class="main_left">
+		{if $type eq 1}
+			<div class="nav">
+				<ul id="J_navbar">
+
+						<li class="cur"><a href="javascript:void(0);" rel="0">日期价格</a></li>
+
+                        <li ><a href="javascript:void(0);" rel="1">线路行程</a></li>
+
+						{if $result.tour_desc_1_name neq ''}
+						<li><a href="javascript:void(0);" rel="2">{$result.tour_desc_1_name}</a></li>
+						{/if}
+						{if $result.tour_desc_2_name neq ''}
+						<li><a href="javascript:void(0);" rel="3">{$result.tour_desc_2_name}</a></li>
+						{/if}
+						{if $result.tour_desc_3_name neq ''}
+						<li><a href="javascript:void(0);" rel="4">{$result.tour_desc_3_name}</a></li>
+						{/if}
+						{if $result.tour_desc_4_name neq ''}
+						<li><a href="javascript:void(0);" rel="5">{$result.tour_desc_4_name}</a></li>
+						{/if}
+
+						<li><a href="javascript:void(0);" rel="6">预订须知</a></li>
+						{if $result.show_sale_list eq 1}
+						<li><a href="javascript:void(0);" rel="7">成交记录</a></li>
+						{/if}
+						<li><a href="javascript:void(0);" rel="8">购买评价</a></li>
+
+
+				</ul>
+			</div>
+
+			<h4 id="J_nbox_0" class="this_detail">日期价格</h4>
+			<div class="calendar">
+				<!-- 日历插件 div -->
+				<div id='loading' style='display:none'>loading...</div>
+				<div id='calendar'></div>
+				<!-- 日历弹出 div -->
+				<div class="buy_box mid-buy_box" >
+					<form action="{url a="tourline_order#index"}" method="post" >
+					<p>
+						<input type="text" name="tourline_item_time" class="mid_tourline_item_time" value="">
+						<input type="hidden" name="tourline_item_id" class="mid_tourline_item_id" value="">
+					</p>
+					<div class="blank"></div>
+					<div class="clearfix">
+						<div class="f_l">
+							<select name="adult_count" style="width:37px;*width:45px;">
+								{foreach from=$select_num item=select_adult key=key}
+									<option value="{$select_adult.value}" {if $key eq 0}selected=selected{/if}>
+										{$select_adult.value}
+									</option>
+								{/foreach}
+							</select> <span class="f_l ptn" style="margin-right:5px;">成人</span>
+							<select name="child_count" style="width:37px;*width:45px;">
+								<option value="0">0</option>
+								{foreach from=$select_num item=select_child key=key}
+									<option value="{$select_child.value}">
+										{$select_child.value}
+									</option>
+								{/foreach}
+							</select> <span class="f_l ptn" >儿童</span>
+						</div>
+						{if $result.child_norm}
+						<div class="child_norm f_r">
+							<a class="norm_a">儿童标准&nbsp;&nbsp;▼</a>
+							<div class="norm_value">
+								{$result.child_norm}
+							</div>
+						</div>
+						{/if}
+					</div>
+					<div class="blank"></div>
+					<p class="clearfix">
+						<input type="hidden" name="tourline_id" value="{$result.id}">
+						<span><input type="submit" name="to_order" class="to_pay_button f_l" value="立即预定"></span>
+					</p>
+					</form>
+				</div>
+			    <!-- 日历弹出 div end-->
+				<!-- mouseover div-->
+				<div class="calendar_mouseover"></div>
+				<!-- mouseover div end-->
+			</div>
+            <div id="J_nbox_1" >
+            {$result.tour_desc}
+            </div>
+			{if $result.tour_desc_1_name neq ''}
+			<h4 id="J_nbox_2">{$result.tour_desc_1_name}</h4>
+			<div class="this_detail">
+				{$result.tour_desc_1}
+			</div>
+			{/if}
+
+			{if $result.tour_desc_2_name neq ''}
+			<h4 id="J_nbox_3">{$result.tour_desc_2_name}</h4>
+			<div class="this_detail">
+				{$result.tour_desc_2}
+			</div>
+			{/if}
+
+			{if $result.tour_desc_3_name neq ''}
+			<h4 id="J_nbox_4">{$result.tour_desc_3_name}</h4>
+			<div class="this_detail">
+				{$result.tour_desc_3}
+			</div>
+			{/if}
+
+			{if $result.tour_desc_4_name neq ''}
+			<h4 id="J_nbox_5">{$result.tour_desc_4_name}</h4>
+			<div class="this_detail">
+				{$result.tour_desc_4}
+			</div>
+			{/if}
+
+		{elseif $type eq 2}
+			<div class="nav">
+				<ul id="J_navbar">
+						<li class="cur"><a href="javascript:void(0);" rel="0">景点简介</a></li>
+
+
+						{if $result.spot_desc_1_name neq ''}
+						<li><a href="javascript:void(0);" rel="1">{$result.spot_desc_1_name}</a></li>
+						{/if}
+						{if $result.spot_desc_2_name neq ''}
+						<li><a href="javascript:void(0);" rel="2">{$result.spot_desc_2_name}</a></li>
+						{/if}
+						{if $result.spot_desc_3_name neq ''}
+						<li><a href="javascript:void(0);" rel="3">{$result.spot_desc_3_name}</a></li>
+						{/if}
+						{if $result.spot_desc_4_name neq ''}
+						<li><a href="javascript:void(0);" rel="4">{$result.spot_desc_4_name}</a></li>
+						{/if}
+
+						<li><a href="javascript:void(0);" rel="6">预订须知</a></li>
+						{if $result.show_sale_list eq 1}
+						<li><a href="javascript:void(0);" rel="7">成交记录</a></li>
+						{/if}
+						<li><a href="javascript:void(0);" rel="8">购买评价</a></li>
+
+				</ul>
+			</div>
+			<div id="J_nbox_0" class="this_detail">
+	              {$result.brief_full}
+			</div>
+			{if $result.spot_desc_1_name neq ''}
+			<h4 id="J_nbox_1">{$result.spot_desc_1_name}</h4>
+			<div class="this_detail">
+				{$result.spot_desc_1}
+			</div>
+			{/if}
+
+			{if $result.spot_desc_2_name neq ''}
+			<h4 id="J_nbox_2">{$result.spot_desc_2_name}</h4>
+			<div class="this_detail">
+				{$result.spot_desc_2}
+			</div>
+			{/if}
+
+			{if $result.spot_desc_3_name neq ''}
+			<h4 id="J_nbox_3">{$result.spot_desc_3_name}</h4>
+			<div class="this_detail">
+				{$result.spot_desc_3}
+			</div>
+			{/if}
+
+			{if $result.spot_desc_4_name neq ''}
+			<h4 id="J_nbox_4">{$result.spot_desc_4_name}</h4>
+			<div class="this_detail">
+				{$result.spot_desc_4}
+			</div>
+			{/if}
+
+
+
+		{/if}
+			<h4 id="J_nbox_6">预订须知</h4>
+			<div class="this_detail">
+				{$result.appointment_desc}
+			</div>
+
+			{if $result.show_sale_list eq 1}
+			<h4 id="J_nbox_7">成交记录</h4>
+			<div class="this_detail">
+									<div class="t">成交记录</div>
+					<div class="bx">
+						<div id="SPOT_SALE_LIST" class="sale_list">
+						{$sale_result.html}
+						</div>
+						<div id="SPOT_SALE_PAGES" class="page" style="text-align: right;">
+						{$sale_result.pager}
+						</div>
+					</div>
+			</div>
+			{/if}
+
+			<h4 id="J_nbox_8">购买评价</h4>
+			<div class="evaluate">
+	           {$review_html}
+
+			</div>
+	</div>
+	</div>
+
+
+	
+</div>
+{/if}
+
+{include file="inc/footer.html"} 
