@@ -4,8 +4,13 @@ class wanyitongModule extends BaseModule{
     
     public function __construct () {
         $this->callbackUrl = 'http://szqy.ffan.com/test/apiserver/notify';
-        $this->clientId = 'ppc000002';
-        $this->key = '7916B929E33C0336C0A1338C096D37DC';
+        $this->clientId = 'pp00000587';
+        $this->spotClientId = 'jf000066';
+        $this->key = '092D9E4F2111C8592C0D2EA0CB43B471';
+        // 卡卷 sign key值
+        $this->kjKey = '092D9E4F2111C8592C0D2EA0CB43B471';
+        // 积分 sign key值
+        $this->jfKey = 'B7BD19D7CAC71337DD643723AF2DA360';
     }
 
     function index () {
@@ -48,11 +53,13 @@ class wanyitongModule extends BaseModule{
      */
     function login () {
         $phone = floor($_REQUEST['phone']);        
-        $backurl = strim($_REQUEST['backUrl']);     
+        $backurl = strim($_REQUEST['backUrl']);
         $redirectUrl = strim($_REQUEST['redirectUrl']);
+        $clientId = strim($_REQUEST['clientId']);
         $GLOBALS['tmpl']->assign("phone", $phone);
         $GLOBALS['tmpl']->assign("backurl", $backurl);
         $GLOBALS['tmpl']->assign("redirectUrl", $redirectUrl);
+        $GLOBALS['tmpl']->assign("clientId", $clientId);
         $GLOBALS['tmpl']->display("wanyitong_login.html");
     }
 
@@ -65,6 +72,10 @@ class wanyitongModule extends BaseModule{
         $user_key = strim($_REQUEST['user_key']);
         $user_pwd = strim($_REQUEST['user_pwd']);
         $backurl = strim($_REQUEST['backurl']);
+        $clientId = strim($_REQUEST['clientId']);
+        if (!$clientId) {
+            $clientId = $this->clientId;
+        }
 
         $result = User::mobile_login($user_key, $user_pwd);
         if($result['status']==4)
@@ -72,15 +83,17 @@ class wanyitongModule extends BaseModule{
             $url = $backurl;
             $post_data['telNo'] = $user_key;
             $post_data['uid']  = $result['user']['id'];
-            $post_data['clientId'] = $this->clientId;
+            $post_data['clientId'] = $clientId;
             $post_data['timestamp'] = time();
             // 获取 sign
-            $str = md5('clientId'.$post_data['clientId'].'telNo'.$post_data['telNo'].'timestamp'.$post_data['timestamp'].'uid'.$post_data['uid'].$this->key);
+            // 根据clientid获取key
+            $key = $clientId == 'pp00000587' ? $this->kjKey : $this->jfKey;
+            $str = md5('clientId'.$post_data['clientId'].'telNo'.$post_data['telNo'].'timestamp'.$post_data['timestamp'].'uid'.$post_data['uid'].$key);
             $post_data['sign'] = $str;
             $resData = $this->request_post($url, $post_data);
             header("Content-Type:text/html; charset=utf-8");
             $res = json_decode($resData['data'], true);
-            ajax_return(array("status"=>1,"message"=>$result['message'],"info"=>$res['message'],"http"=>$resData['status'],"code"=>$res['code'],"jump"=>$res));
+            ajax_return(array("status"=>1,"info"=>$res['message'],"http"=>$resData['status'],"code"=>$res['code'],"jump"=>$res, "clientId"=>$clientId));
             exit;
         }
         elseif($result['status']==1)
@@ -88,7 +101,7 @@ class wanyitongModule extends BaseModule{
             if($result['user']['email']!="")$type="email";
             if($result['user']['mobile']!="")$type="mobile";
 
-            showSuccess($result['message'],$ajax,url("user#doverify",array("un"=>$result['user']['user_name'],"t"=>$type)));
+            showSuccess($result['message'],$ajax,url("user#doverify",array("un"=>$result['user']['user_name'],"t"=>$type, "clientId"=>$clientId)));
         }
         else
         {
@@ -104,9 +117,11 @@ class wanyitongModule extends BaseModule{
         $phone = strim($_REQUEST['phone']);        
         $backurl = strim($_REQUEST['backurl']);
         $redirectUrl = strim($_REQUEST['redirectUrl']);
+        $clientId = strim($_REQUEST['clientId']);
         $GLOBALS['tmpl']->assign("phone", $phone);
         $GLOBALS['tmpl']->assign("backurl", $backurl);
         $GLOBALS['tmpl']->assign("redirectUrl", $redirectUrl);
+        $GLOBALS['tmpl']->assign("clientId", $clientId);
         $GLOBALS['tmpl']->display("wanyitong_register.html");
     }
 
@@ -120,7 +135,12 @@ class wanyitongModule extends BaseModule{
         $user_pwd  = strim($_POST['user_pwd']);
         $cfm_user_pwd  = strim($_POST['cfm_user_pwd']);
         $backurl = strim($_REQUEST['backurl']);
-        $ck = User::checkfield("user_name", $user_name);        
+        $ck = User::checkfield("user_name", $user_name);
+        $clientId = strim($_REQUEST['clientId']);
+        if (!$clientId) {
+            $clientId = $this->clientId;
+        }
+
         if($ck['status']==0)
         {
             ajax_return(array("status"=>0,"info"=>$ck['info'],"field"=>"user_name"));
@@ -167,7 +187,7 @@ class wanyitongModule extends BaseModule{
         
         $user_data = array();
         $user_data['user_name'] = $user_name;
-       
+        
         $user_data['mobile'] = $mobile;
         
         $user_data['salt'] = USER_SALT;
@@ -176,7 +196,7 @@ class wanyitongModule extends BaseModule{
         $user_data['create_time'] = NOW_TIME;
         $user_data['integrate_id'] = intval($ck['data']);
         $user_data['is_verify'] = 1;
-     
+        
         $user_data['source'] = empty($GLOBALS['ref'])?"native":$GLOBALS['ref'];  //来路
         $user_data['pid'] = intval($GLOBALS['ref_pid']); //推荐人
         $user_data['nickname'] = $user_data['user_name'];
@@ -213,10 +233,12 @@ class wanyitongModule extends BaseModule{
             $url = $backurl;
             $post_data['telNo'] = $mobile;
             $post_data['uid']  = $user_id;
-            $post_data['clientId'] = $this->clientId;
+            $post_data['clientId'] = $clientId;
             $post_data['timestamp'] = time();
             // 获取 sign
-            $str = md5('clientId'.$post_data['clientId'].'telNo'.$post_data['telNo'].'timestamp'.$post_data['timestamp'].'uid'.$post_data['uid'].$this->key);
+            // 根据clientid获取key
+            $key = $clientId == 'pp00000460' ? $this->kjKey : $this->jfKey;
+            $str = md5('clientId'.$post_data['clientId'].'telNo'.$post_data['telNo'].'timestamp'.$post_data['timestamp'].'uid'.$post_data['uid'].$key);
             $post_data['sign'] = $str;
             $resData = $this->request_post($url, $post_data);
             header("Content-Type:text/html; charset=utf-8");
@@ -540,6 +562,254 @@ class wanyitongModule extends BaseModule{
                 'data'=> array(
                     'txnId'=> $txnId,
                     'transId'=> $voucherTransfer['transId']
+                )
+            ));
+        } else {
+            ajax_return(array(
+                'code'=> '01',
+                'msg'=> '查询失败'
+            ));
+        }
+    }
+
+    /**
+     * [checkScore 查询用户积分等信息]
+     * @param  [String] $uid [必填] [用户唯一标识:唯一标识用户的字符串]
+     * @param  [String] $exCode [必填] [积分品种代码:如果商户存在多种积分,类型则需要该参数]
+     * @param  [String] $sign [必填] [签名:根据参数名称进行倒序，然后再进行签名的生成，可以采用 SHA、MD5 等相关方案]
+     * @param  [String] $timestamp [必填] [时间戳:每次请求的时间戳，格式化为：yyyyMMddHHmmss]
+     * @return [String] $code [必填] [返回代码: 00 表示成功，其他的都表示失败]
+     * @return [String] $msg [必填] [返回信息:接口返回的各种信息]
+     * @return [Data] $data [必填] [数据集合:以下为 Data 对象内容]
+     * @return [String] $balance [必填] [积分余额:用户可用积分余额]
+     * @return [String] $gender [必填] [性别:用户性别:M/F]
+     * @return [String] $age [必填] [年龄:用户年龄]
+     * @return [String] $birthday [必填] [生日:用户生日]
+     * @return [String] $custLevel [必填] [用户等级]
+     * @return [String] $endDate [必填] [有效等级结束日:当前有效等级结束日格式：yyyyMMdd]
+     */
+    public function checkUserInfo () {
+        $uid = strim($_POST['uid']);
+        if (!$uid) {
+            ajax_return(array(
+                'code'=> '01',
+                'msg'=> '查询失败'
+            ));
+            exit;
+        }
+
+        $userData = $GLOBALS['db']->getRow("select score, sex, birthday, level_id from ".DB_PREFIX."user where id = ".$uid);
+
+        if($GLOBALS['db']->error()=="")
+        {
+            ajax_return(array(
+                'code'=> '00',
+                'msg'=> '请求成功',
+                'data'=> array(
+                    'balance'=> $userData['score'],
+                    'gender'=> $userData['sex'] === "-1" ? "F" : "M",
+                    'age'=> '21',
+                    'birthday'=> $userData['birthday'],
+                    'custLevel'=> $userData['level_id'] === "1" ? "新手上路" : "初入江湖",
+                    'endDate'=> "2090-09-10",
+                    'uid'=> $uid
+                )
+            ));
+        } else {
+            ajax_return(array(
+                'code'=> '01',
+                'msg'=> '查询失败'
+            ));
+        }
+    }
+
+    /**
+     * [checkScore 中间账户+积分转账模式 中间人账号id 39]
+     * @param  [String] $buyUid [必填] [买方用户唯一标识:唯一标识用户的字符串]
+     * @param  [String] $sellUid [必填] [卖方用户唯一标识:唯一标识用户的字符串]
+     * @param  [String] $exCode [必填] [积分品种代码:如果商户存在多种积分类型，则需要该参数默认为1]
+     * @param  [String] $quantity [必填] [积分数量:转账的积分数量]
+     * @param  [String] $txnId [必填] [万益通流水号:唯一标识本次请求的流水号也可以是订单号，用户后续对账]
+     * @param  [String] $sign [必填] [签名:根据参数名称进行倒序，然后再进行签名的生成，可以采用 SHA、MD5 等相关方案]
+     * @param  [String] $timestamp [必填] [时间戳:每次请求的时间戳，格式化为：yyyyMMddHHmmss]
+     * @return [String] $code [必填] [返回代码: 00 表示成功，其他的都表示失败]
+     * @return [String] $msg [必填] [返回信息:接口返回的各种信息]
+     * @return [Data] $data [必填] [数据集合:以下为 Data 对象内容]
+     * @return [String] $txnId [必填] [万益通流水号:唯一标识本次请求的流水号也可以是订单号，用户后续对账]
+     * @return [String] $transId [必填] [第三方流水号:第三方的唯一流水号]
+     */
+    public function userScoreTransfer () {
+        $buyUid = strim($_POST['buyUid']);
+        $sellUid = strim($_POST['sellUid']);
+        $exCode = strim($_POST['exCode']);
+        $quantity = strim($_POST['quantity']);
+        $txnId = strim($_POST['txnId']);
+        $sign  = strim($_POST['sign']);
+        $timestamp  = strim($_POST['timestamp']);
+
+        $scoreTransfer = $GLOBALS['db']->getOne("select txnId from ".DB_PREFIX."score_transfer where txnId = '".$txnId."'");
+
+        if ($scoreTransfer) {
+            ajax_return(array(
+                'code'=> '04',
+                'msg'=> '请勿重复交易'
+            ));
+            exit;
+        }
+
+        $scoreData = $GLOBALS['db']->getRow("select score from ".DB_PREFIX."user where id = '".$sellUid."'");
+        if (!$scoreData) {
+            ajax_return(array(
+                'code'=> '01',
+                'msg'=> '查询失败'
+            ));
+            exit;
+        }
+
+        $score = $scoreData['score'];
+
+        if ($score < $quantity) {
+            ajax_return(array(
+                'code'=> '02',
+                'msg'=> '交易数额大于余额'
+            ));
+            exit;
+        }
+
+        // 减少卖方user记录中score数
+        $reduceScore = $score - $quantity;
+        $GLOBALS['db']->query("update ".DB_PREFIX."user set score = '".$reduceScore."' where id = '".$sellUid."' limit 1");
+        if($GLOBALS['db']->error()!="")
+        {
+          ajax_return(array(
+              'code'=> '03',
+              'msg'=> '交易失败,服务器错误'
+          ));
+        }
+        // 增加买方user记录中score数
+        $buyScoreData = $GLOBALS['db']->getRow("select score from ".DB_PREFIX."user where id = '".$buyUid."'");
+        $increaseScore = $buyScoreData['score'] + $quantity;
+        $GLOBALS['db']->query("update ".DB_PREFIX."user set score = '".$increaseScore."' where id = '".$buyUid."' limit 1");
+
+        if($GLOBALS['db']->error()=="")
+        {
+            $transfer_data = array();
+            $transfer_data['buyUid'] = $buyUid;
+            $transfer_data['sellUid'] = $sellUid;
+            $transfer_data['exCode'] = $exCode;
+            $transfer_data['quantity'] = $quantity;
+            $transfer_data['txnId'] = $txnId;
+            $transfer_data['status'] = 1;
+            $transfer_data['transId'] = 'W'.time();
+            $GLOBALS['db']->autoExecute(DB_PREFIX."score_transfer",$transfer_data,"INSERT","","SILENT");
+            ajax_return(array(
+                'code'=> '00',
+                'msg'=> '请求成功',
+                'data'=> array(
+                    'txnId'=> $txnId,
+                    'transId'=> $transfer_data['transId']
+                )
+            ));
+        } else {
+            ajax_return(array(
+                'code'=> '03',
+                'msg'=> '交易失败,服务器错误'
+            ));
+        }
+    }
+
+    /**
+     * [checkScore 积分交易查询交易]
+     * @param  [String] $txnId [必填] [万益通流水号:唯一标识本次请求的流水号也可以是订单号，用户后续对账]
+     * @param  [String] $sign [必填] [签名:根据参数名称进行倒序，然后再进行签名的生成，可以采用 SHA、MD5 等相关方案]
+     * @param  [String] $timestamp [必填] [时间戳:每次请求的时间戳，格式化为：yyyyMMddHHmmss]
+     * @return [String] $code [必填] [返回代码: 00 表示成功，其他的都表示失败]
+     * @return [String] $msg [必填] [返回信息:接口返回的各种信息]
+     * @return [Data] $data [必填] [数据集合:以下为 Data 对象内容]
+     * @return [String] $txnId [必填] [万益通流水号:唯一标识本次请求的流水号也可以是订单号，用户后续对账]
+     * @return [String] $transId [必填] [第三方流水号:第三方的唯一流水号]
+     */
+    public function checkUserScoreTransfer () {
+        $txnId = strim($_POST['txnId']);
+        $sign  = strim($_POST['sign']);
+        $timestamp  = strim($_POST['timestamp']);
+
+        $scoreTransfer = $GLOBALS['db']->getRow("select txnId, transId from ".DB_PREFIX."score_transfer where txnId = '".$txnId."'");
+
+        if($GLOBALS['db']->error()=="")
+        {
+            ajax_return(array(
+                'code'=> '00',
+                'msg'=> '请求成功',
+                'data'=> array(
+                    'txnId'=> $txnId,
+                    'transId'=> $scoreTransfer['transId']
+                )
+            ));
+        } else {
+            ajax_return(array(
+                'code'=> '01',
+                'msg'=> '查询失败'
+            ));
+        }
+    }
+
+    /**
+     * [checkScore 积分退回接口]
+     * @param  [String] $txnId [必填] [万益通流水号:唯一标识本次请求的流水号也可以是订单号，用户后续对账]
+     * @param  [String] $origTxnId [必填] [原下单流水号:原挂单时扣分请求万益通流水号]
+     * @param  [String] $quantity [必填] [退还的数量:退还积分数量]
+     * @param  [String] $cancelType [必填] [退还类型:类型如下：全额退还、部分退还]
+     * @param  [String] $sign [必填] [签名:根据参数名称进行倒序，然后再进行签名的生成，可以采用 SHA、MD5 等相关方案]
+     * @param  [String] $timestamp [必填] [时间戳:每次请求的时间戳，格式化为：yyyyMMddHHmmss]
+     * @return [String] $code [必填] [返回代码: 00 表示成功，其他的都表示失败]
+     * @return [String] $msg [必填] [返回信息:接口返回的各种信息]
+     * @return [Data] $data [必填] [数据集合:以下为 Data 对象内容]
+     * @return [String] $txnId [必填] [万益通流水号:唯一标识本次请求的流水号也可以是订单号，用户后续对账]
+     * @return [String] $transId [必填] [第三方流水号:第三方的唯一流水号]
+     */
+    public function giveBackScore () {
+        $txnId = strim($_POST['txnId']);
+        $origTxnId = strim($_POST['origTxnId']);
+        $quantity = strim($_POST['quantity']);
+
+        $scoreTransfer = $GLOBALS['db']->getRow("select sellUid, buyUid, quantity, txnId, transId from ".DB_PREFIX."score_transfer where txnId = '".$origTxnId."'");
+
+        if ($scoreTransfer['quantity'] < $quantity) {
+            ajax_return(array(
+                'code'=> '02',
+                'msg'=> '退还数额大于原本交易数额'
+            ));
+            exit;
+        }
+
+        // 减少原本买方user记录中score数
+        $buyUid = $scoreTransfer['buyUid'];
+        $buyData = $GLOBALS['db']->getRow("select score from ".DB_PREFIX."user where id = '".$buyUid."'");
+        $reduceScore = $buyData['score'] - $quantity;
+        $GLOBALS['db']->query("update ".DB_PREFIX."user set score = '".$reduceScore."' where id = '".$buyUid."' limit 1");
+        // 增加原本卖方user记录中score数
+        $sellUid = $scoreTransfer['sellUid'];
+        $sellData = $GLOBALS['db']->getRow("select score from ".DB_PREFIX."user where id = '".$sellUid."'");
+        $increaseScore = $sellData['score'] + $quantity;
+        $GLOBALS['db']->query("update ".DB_PREFIX."user set score = '".$increaseScore."' where id = '".$sellUid."' limit 1");
+
+        if($GLOBALS['db']->error()=="")
+        {
+            $transfer_data = array();
+            $transfer_data['exCode'] = 1;
+            $transfer_data['quantity'] = $quantity;
+            $transfer_data['txnId'] = $txnId;
+            $transfer_data['type'] = 2;
+            $transfer_data['status'] = 1;
+            $transfer_data['transId'] = 'W'.time();
+            $GLOBALS['db']->autoExecute(DB_PREFIX."score_transfer",$transfer_data,"INSERT","","SILENT");
+            ajax_return(array(
+                'code'=> '00',
+                'msg'=> '请求成功',
+                'data'=> array(
+                    'txnId'=> $txnId,
+                    'transId'=> $transfer_data['transId']
                 )
             ));
         } else {

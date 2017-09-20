@@ -242,30 +242,12 @@ class User{
 				return array("status"=>1);
 			}
 		}
-		/*
-		if($fieldname=="user_name")
-		{
-			preg_match("/[\W]+/", $fieldvalue,$matches);
-			if($matches)
-			{
-				return array("status"=>0,"info"=>"用户名只能是数字字母下划线");
-			}
-			$rs = $GLOBALS['db']->getOne("select count(*) from ".DB_PREFIX."user where user_name = '".$fieldvalue."' and id <> ".$uid);
-			if($rs>0)
-			{
-				return array("status"=>0,"info"=>"用户名已存在");
-			}
-			else
-			{
-				return array("status"=>1);
-			}
-		}
-		*/
+
 		
 		if($fieldname=='user_name')
 		{
-			preg_match("/^[\x{4e00}-\x{9fa5}_\-]*[0-9a-zA-Z_\-]*[\x{201c}\x{201d}\x{3001}\x{uff1a}\x{300a}\x{300b\x{ff0c}\x{ff1b}\x{3002}_\-]*$/u",$fieldvalue,$matches);
-			if(!$matches)
+
+			if($matches)
 			{
 				return array("status"=>0,"info"=>"用户名不能有非法字符");
 			}

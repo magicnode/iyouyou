@@ -65,11 +65,8 @@
   <div class="container">
     <canvas id="Mycanvas" width="546" height="780" style="opacity: .5"></canvas>
     <div class="bind">
-      <p class="bind-title">      
-        <?php
-          $this->_var['logo_image'] = app_conf("SITE_LOGO");
-        ?>
-        {function name="load_page_png" v=$logo_image}
+      <p class="bind-title">
+        <span style="display:inline-block; width:177px; height:80px; background:url('http://optlg7gb6.bkt.clouddn.com/haolonglogo.png') no-repeat;background-size: 100% 100%;"></span>
       </p>
       <div class="bind-container">
         <div class="bind-container-form">
@@ -96,8 +93,10 @@
 		var registUrl = '{url r="wanyitong#doregist"}';
 		var backurl = '{$backurl}';
 		var redirectUrl = '{$redirectUrl}';
+		var clientId = '{$clientId}';
 		console.log('backurl', backurl);
 		console.log('redirectUrl', redirectUrl);
+		console.log('clientId', clientId);
 
 		function checkMobile(val){ 
 	    if(!(/^1[3|4|5|8|7|9][0-9]\d{4,8}$/.test(val))){ 
@@ -129,7 +128,8 @@
 					user_pwd: userPwd,
 					cfm_user_pwd: cfmUserPwd,
 					mobile: mobile,
-					backurl: backurl
+					backurl: backurl,
+					clientId: clientId
 				}
 			})
 			.success(function(data) {

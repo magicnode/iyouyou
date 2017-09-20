@@ -10,19 +10,18 @@
                 </tr>
                 <tr id="travCouponArea" class="citem">
                    <td class="first">
-                       <input type="checkbox" id="travCouponAreaBox"  autocomplete="off">
+                       <!-- <input type="checkbox" id="travCouponAreaBox"  autocomplete="off"> -->
                        <a id="lvyouquan" href="javascript:void(0)" >
                        		代金券
 							<span>▼</span>
 					   </a>
-                       
                    </td>
                    <td align="center" id="haveTravelValue" value="0">¥{$voucher_useable_money}</td>
                </tr>
 			   {foreach from="$voucher_list" item="voucher"}
 			   <tr class="citem hide J_travCouponList">
                    <td class="first">
-                   		<input type="checkbox" name="voucher[]" value="{$voucher.id}"  autocomplete="off" />
+                   		<input type="radio" name="voucher[]" value="{$voucher.id}"  autocomplete="off" />
                       {$voucher.voucher_name}
                    </td>
                    <td align="center" id="haveTravelValue" value="{function name="format_price_to_display" v="$voucher.money"}">

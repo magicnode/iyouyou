@@ -5623,13 +5623,16 @@ _plugin('core', function(K) {
 				width : 150
 			});
 		_each(self.lang('fontname.fontName'), function(key, val) {
-			menu.addItem({
-				title : '<span style="font-family: ' + key + ';" unselectable="on">' + val + '</span>',
-				checked : (curVal === key.toLowerCase() || curVal === val.toLowerCase()),
-				click : function() {
-					self.exec('fontname', key).hideMenu();
-				}
-			});
+      // 如果字体为微软雅黑则不展示在页面上
+			if (key!=='Microsoft YaHei') {
+				menu.addItem({
+					title : '<span style="font-family: ' + key + ';" unselectable="on">' + val + '</span>',
+					checked : (curVal === key.toLowerCase() || curVal === val.toLowerCase()),
+					click : function() {
+						self.exec('fontname', key).hideMenu();
+					}
+				});
+			}
 		});
 	});
 	self.clickToolbar('fontsize', function() {

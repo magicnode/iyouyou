@@ -77,11 +77,8 @@
   <div class="container">
     <canvas id="Mycanvas" width="546" height="780" style="opacity: .5"></canvas>
     <div class="bind">
-      <p class="bind-title">      
-        <?php
-          $this->_var['logo_image'] = app_conf("SITE_LOGO");
-        ?>
-        {function name="load_page_png" v=$logo_image}
+      <p class="bind-title">
+        <span style="display:inline-block; width:177px; height:80px; background:url('http://optlg7gb6.bkt.clouddn.com/haolonglogo.png') no-repeat;background-size: 100% 100%;"></span>
       </p>
       <div class="bind-container">
         <div class="bind-container-form">
@@ -92,7 +89,7 @@
         </div>
     	<div class="btn">
     	  <button type="" class="login">登录</button>
-    	  <a href="{url r="wanyitong#regist" p="phone=$phone&backurl=$backurl&redirectUrl=$redirectUrl"}" class="register">
+    	  <a href="{url r="wanyitong#regist" p="phone=$phone&backurl=$backurl&redirectUrl=$redirectUrl&clientId=$clientId"}" class="register">
     	    注册
     	  </a>
 
@@ -110,6 +107,7 @@
 		console.log('backurl', backurl)
 		console.log('redirectUrl', redirectUrl)
 		$login.click(function () {
+			console.log('clientId', clientId)
 			$.ajax({
 				url: loginUrl,
 				type: 'POST',
@@ -117,7 +115,8 @@
 				data: {
 					user_key: userKey,
 					user_pwd: $('#pwd').val(),
-					backurl: backurl
+					backurl: backurl,
+					clientId: clientId
 				}
 			})
 			.done(function(data) {
