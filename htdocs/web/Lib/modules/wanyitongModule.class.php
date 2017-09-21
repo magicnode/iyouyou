@@ -237,7 +237,7 @@ class wanyitongModule extends BaseModule{
             $post_data['timestamp'] = time();
             // 获取 sign
             // 根据clientid获取key
-            $key = $clientId == 'pp00000460' ? $this->kjKey : $this->jfKey;
+            $key = $clientId == 'pp00000587' ? $this->kjKey : $this->jfKey;
             $str = md5('clientId'.$post_data['clientId'].'telNo'.$post_data['telNo'].'timestamp'.$post_data['timestamp'].'uid'.$post_data['uid'].$key);
             $post_data['sign'] = $str;
             $resData = $this->request_post($url, $post_data);
