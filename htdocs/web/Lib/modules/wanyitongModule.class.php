@@ -755,7 +755,7 @@ class wanyitongModule extends BaseModule{
     }
 
     /**
-     * [checkScore 积分退回接口]
+     * [积分退回接口]
      * @param  [String] $txnId [必填] [万益通流水号:唯一标识本次请求的流水号也可以是订单号，用户后续对账]
      * @param  [String] $origTxnId [必填] [原下单流水号:原挂单时扣分请求万益通流水号]
      * @param  [String] $quantity [必填] [退还的数量:退还积分数量]
@@ -773,7 +773,33 @@ class wanyitongModule extends BaseModule{
         $origTxnId = strim($_POST['origTxnId']);
         $quantity = strim($_POST['quantity']);
 
-        $scoreTransfer = $GLOBALS['db']->getRow("select sellUid, buyUid, quantity, txnId, transId from ".DB_PREFIX."score_transfer where txnId = '".$origTxnId."'");
+        $checkTransfer = $GLOBALS['db']->getOne("select txnId, transId from ".DB_PREFIX."score_transfer where txnId = '".$txnId."'");
+
+        if ($checkTransfer) {
+            ajax_return(array(
+                'code'=> '04',
+                'msg'=> '请勿重复交易'
+            ));
+            exit;
+        }
+
+        $scoreTransfer = $GLOBALS['db']->getRow("select id, sellUid, buyUid, quantity, txnId, transId, isBack from ".DB_PREFIX."score_transfer where txnId = '".$origTxnId."'");
+
+        if (!$scoreTransfer) {
+            ajax_return(array(
+                'code'=> '05',
+                'msg'=> '交易不存在'
+            ));
+            exit;
+        }
+
+        if ($scoreTransfer['isBack'] == 1) {
+            ajax_return(array(
+                'code'=> '06',
+                'msg'=> '积分已被撤回'
+            ));
+            exit;
+        }
 
         if ($scoreTransfer['quantity'] < $quantity) {
             ajax_return(array(
@@ -793,6 +819,8 @@ class wanyitongModule extends BaseModule{
         $sellData = $GLOBALS['db']->getRow("select score from ".DB_PREFIX."user where id = '".$sellUid."'");
         $increaseScore = $sellData['score'] + $quantity;
         $GLOBALS['db']->query("update ".DB_PREFIX."user set score = '".$increaseScore."' where id = '".$sellUid."' limit 1");
+        // 这是原来记录中isBack为1
+        $GLOBALS['db']->query("update ".DB_PREFIX."score_transfer set isBack = 1 where id = '".$scoreTransfer['id']."' limit 1");
 
         if($GLOBALS['db']->error()=="")
         {
@@ -809,7 +837,7 @@ class wanyitongModule extends BaseModule{
                 'msg'=> '请求成功',
                 'data'=> array(
                     'txnId'=> $txnId,
-                    'transId'=> $transfer_data['transId']
+                    'transId'=> $transfer_data['transId'],
                 )
             ));
         } else {
