@@ -1,4 +1,4 @@
-<?php exit;?>a:3:{s:8:"template";a:6:{i:0;s:72:"E:/YouYou/iyouyou/htdocs/web/Tpl/fanwe/inc/recommend_index_tourline.html";i:1;s:49:"E:/YouYou/iyouyou/htdocs/web/Tpl/fanwe/index.html";i:2;s:54:"E:/YouYou/iyouyou/htdocs/web/Tpl/fanwe/inc/header.html";i:3;s:61:"E:/YouYou/iyouyou/htdocs/web/Tpl/fanwe/inc/define_js_url.html";i:4;s:61:"E:/YouYou/iyouyou/htdocs/web/Tpl/fanwe/inc/top_nav_right.html";i:5;s:55:"E:/YouYou/iyouyou/htdocs/web/Tpl/fanwe/inc/footer1.html";}s:7:"expires";i:1504170469;s:8:"maketime";i:1504169869;}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<?php exit;?>a:3:{s:8:"template";a:6:{i:0;s:74:"F:/YouYou/IYouYouPC/htdocs/web/Tpl/fanwe/inc/recommend_index_tourline.html";i:1;s:51:"F:/YouYou/IYouYouPC/htdocs/web/Tpl/fanwe/index.html";i:2;s:56:"F:/YouYou/IYouYouPC/htdocs/web/Tpl/fanwe/inc/header.html";i:3;s:63:"F:/YouYou/IYouYouPC/htdocs/web/Tpl/fanwe/inc/define_js_url.html";i:4;s:63:"F:/YouYou/IYouYouPC/htdocs/web/Tpl/fanwe/inc/top_nav_right.html";i:5;s:57:"F:/YouYou/IYouYouPC/htdocs/web/Tpl/fanwe/inc/footer1.html";}s:7:"expires";i:1511803943;s:8:"maketime";i:1511803343;}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -37,9 +37,9 @@ var user_follow_url = "http://localhost/iyouyou/index.php?ctl=user&act=user_foll
 var user_follows_url = "http://localhost/iyouyou/index.php?ctl=user&act=user_follows";
 var remove_fans_url = "http://localhost/iyouyou/index.php?ctl=user&act=remove_fans";
 </script>
-<link rel="stylesheet" type="text/css" href="http://localhost/iyouyou/public/runtime/web/statics/94213d68320ab4782510a86584bad8dc.css" />
+<link rel="stylesheet" type="text/css" href="http://localhost/iyouyou/public/runtime/web/statics/a31aa82e54508b02982577d7cb3e891b.css" />
 <script type="text/javascript" src="/iyouyou/public/runtime/web/lang.js"></script>
-<script type="text/javascript" src="http://localhost/iyouyou/public/runtime/web/statics/df997b7748bda5e216247909eec3d2dd.js"></script>
+<script type="text/javascript" src="http://localhost/iyouyou/public/runtime/web/statics/95435d977a0221ab5d3599b4d495a84c.js"></script>
 554fcae493e564ee0dc75bdf2ebf94caload_daily_login|YToxOntzOjQ6Im5hbWUiO3M6MTY6ImxvYWRfZGFpbHlfbG9naW4iO30=554fcae493e564ee0dc75bdf2ebf94ca
 </head>
 <body>

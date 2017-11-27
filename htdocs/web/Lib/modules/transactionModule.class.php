@@ -35,21 +35,24 @@ class transactionModule extends BaseModule
 		$GLOBALS['tmpl']->assign("order_type",$order_type);
 		$GLOBALS['tmpl']->assign("order_sn",$order_sn);
 		
-		$payment_list = load_auto_cache("payment_list");  //加载支付接口列表
+		//加载支付接口列表
+		$payment_list = load_auto_cache("payment_list");  
+		// var_dump($payment_list);
 		$GLOBALS['tmpl']->assign("payment_list",$payment_list);
-/* 用户下单 推送短信给用户API*/
-		require_once 'ChuanglanSmsHelper/ChuanglanSmsApi.php';
-		$clapi  = new ChuanglanSmsApi();
- 		$appoint_mobile = $_SESSION['mobile'];/*获取预订人手机号*/
-		$result = $clapi->sendSMS($appoint_mobile,'提示您，您有一条未支付的订单，请前往支付。客服热线：400-8881583','true');
+    /* 用户下单 推送短信给用户API*/
+		// require_once 'ChuanglanSmsHelper/ChuanglanSmsApi.php';
+		// $clapi  = new ChuanglanSmsApi();
+ 		/*获取预订人手机号*/
+ 		// $appoint_mobile = $_SESSION['mobile'];
+		// $result = $clapi->sendSMS($appoint_mobile,'提示您，您有一条未支付的订单，请前往支付。客服热线：400-8881583','true');
 		//print_r($result);
-		$result = $clapi->execResult($result);
+		// $result = $clapi->execResult($result);
 		//if($result[1]==0){
 			//echo '发送成功';
 		//}else{
 			//echo "发送失败{$result[1]}";
 		//}
-/*短信接口结束*/
+    /*短信接口结束*/
 		
  		
 		

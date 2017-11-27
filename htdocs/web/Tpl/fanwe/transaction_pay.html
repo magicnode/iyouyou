@@ -50,10 +50,14 @@
 			{/if}
 			{if $payment_list.common_payment}
 			<div class="box_item {if empty($payment_list.bank_payment)}current{/if}" rel="common">
+				<div class="pay_item">
+					<input type="radio" name="payment_class" value="Kqpay" />
+					<img src="https://img.99bill.com/public/img/99billlogo/logo-header.png" alt="快钱" />
+				</div>
 				{foreach from=$payment_list.common_payment item=pay_item}
 				<div class="pay_item">
-				<input type="radio" name="payment_class" value="{$pay_item.class_name}" />
-				<img src="{$pay_item.logo}" alt="{$pay_item.name}" />
+					<input type="radio" name="payment_class" value="{$pay_item.class_name}" />
+					<img src="{$pay_item.logo}" alt="{$pay_item.name}" />
 				</div>
 				{/foreach}
 				<div class="blank1"></div>
