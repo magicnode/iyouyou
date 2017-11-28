@@ -4,6 +4,6 @@ htdocs/public/db_config.php.bak
 
 .phpintel
 
-online/htdocs/*.pem
+htdocs/*.pem
 
-online/htdocs/*.cer
+htdocs/*.cer
